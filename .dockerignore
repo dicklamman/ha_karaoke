@@ -1,0 +1,52 @@
+# The build context only needs the server source, the API requirements and the
+# docs. Everything below is either a local artifact or something the image
+# must not carry into itself.
+
+# Local state: the song library, the SQLite job store and the generated media.
+# The server creates these at runtime in the mounted volume.
+karaoke/service-data/
+karaoke/data/
+karaoke/lyrics/
+karaoke/samples/
+karaoke/checkpoints/
+karaoke/research/
+karaoke/web/assets/
+karaoke/web/catalog.json
+
+# Models and weights are not part of this image; they are mounted separately.
+karaoke/models/alignment/
+karaoke/models/pretrained/*.ckpt
+
+# Local environments and caches.
+.venv*/
+venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
+
+# Secrets.
+.env
+.env.*
+!.env.example
+*cookies*.txt
+*cookies*.json
+*.pem
+*.key
+
+# Version control and CI.
+.git/
+.gitignore
+.github/
+
+# The linting and test tooling is not needed to run the server.
+eslint.config.mjs
+package.json
+package-lock.json
+pyproject.toml
+requirements-dev.txt
+requirements-full.txt
+requirements-lint.txt

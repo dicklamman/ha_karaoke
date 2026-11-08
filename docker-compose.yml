@@ -1,0 +1,38 @@
+services:
+  karaoke:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dicklamman/ha_karaoke:latest
+    container_name: karaoke
+    restart: unless-stopped
+    ports:
+      # Host port -> container port. Change the left side to move the service
+      # on the host.
+      - "8746:8746"
+    environment:
+      # The image already sets these; they are repeated here so that the
+      # compose file is the single place to change them.
+      KARAOKE_HOST: "0.0.0.0"
+      KARAOKE_PORT: "8746"
+      # The song library, the SQLite job store and the generated media live
+      # here. This is the volume that has to survive a rebuild.
+      KARAOKE_DATA_DIR: "/data"
+      # Cache ceiling in GiB. The library trims itself back to this size once
+      # the limit is passed, keeping the song that is playing and the songs in
+      # the queue.
+      KARAOKE_CACHE_MAX_GIB: "10"
+      # Songs being prepared at the same time. One matches a single GPU queue.
+      KARAOKE_PREPARATION_CONCURRENCY: "1"
+      # This image has no GPU and no separation models, so the preparation
+      # stages cannot run. Leaving the backend on the API keeps the text and
+      # metadata work working; the audio separation needs a separate image.
+      KARAOKE_ASR_BACKEND: "api"
+      KARAOKE_DEVICE: "cpu"
+      # Set this to enable the OpenAI-backed lyric and metadata steps.
+      # OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    volumes:
+      - karaoke-data:/data
+
+volumes:
+  karaoke-data:
